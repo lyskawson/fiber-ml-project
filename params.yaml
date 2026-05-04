@@ -1,0 +1,13 @@
+ingest:
+  channel_names:
+    - length_1_m
+    - length_2_m
+    - amplitude_db_mm
+    - spectral_shift_ghz
+    - spectral_shift_quality
+  expected_n_points: 41648
+  compression:
+    codec: zstd
+    level: 5
+
+preprocessing: {}  # TBD after feature engineering decision

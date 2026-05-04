@@ -1,0 +1,16 @@
+Folder oznaczony jest jako Tx_RHy, gdzie x to wartość temperatury, y to wartość wilgotności względnej.
+W każdym folderze są pomiary wyselekcjonowane po godzinnej stabilizacji.
+Liczba pomiarów na dany stan temperaturowo-wilgotnościowy to 20.
+Łączna liczba plików pomiarowych to 700.
+
+Jako zakres czujnika przyjmujemy dwa przedziały długościowe.
+1. zakres od 2.65999 do 2.80083
+2. zakres od 3.22034 do 3.36018
+
+Uwaga:
+To oznacza, że przyjmujemy dwuelementowy zbiór dla każdego punktu wzdłuż długości.
+
+Przykład:
+Przesunięcie widmowe (y1) dla punktu 2.65999 i przesunięcie widmowe (y2) dla punktu 3.22034 stanowi nierozłączny zbiór (y1, y2) dla punktu 0.0 czujnika
+
+

@@ -1,0 +1,12 @@
+* text=auto
+
+*.txt text eol=lf
+*.py text eol=lf
+*.md text eol=lf
+*.yaml text eol=lf
+*.yml text eol=lf
+*.toml text eol=lf
+*.csv text eol=lf
+
+# preserve original CRLF format of sample measurement files
+data/sample/**/*.txt text eol=crlf

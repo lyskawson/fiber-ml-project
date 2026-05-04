@@ -1,0 +1,47 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+.uv-cache/
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.ipynb_checkpoints/
+dist/
+
+# Data (DVC managed)
+data/raw/**
+!data/raw/.gitkeep
+data_processed/**
+!data_processed/.gitkeep
+*.zarr/
+*.h5
+*.hdf5
+!data/sample/**
+
+# Models / artifacts
+models/
+*.pt
+*.onnx
+*.pkl
+
+# Reports (generated)
+reports/metrics/*
+reports/figures/*
+!reports/metrics/.gitkeep
+!reports/figures/.gitkeep
+
+# OS / IDE
+.DS_Store
+.idea/
+.vscode/
+*.swp
+
+# Secrets
+.env
+*.pem
+gdrive-credentials.json
+
+# Claude Code memory (local agent state)
+.claude/
