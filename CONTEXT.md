@@ -74,6 +74,20 @@ Compression: `Blosc(cname='zstd', clevel=5, shuffle=BITSHUFFLE)`.
    point has a (y1, y2) pair from the two measurement ranges. This implies the feature space
    is 2D per position, not 1D. Awaiting clarification on how to align the two ranges.
 
+## Data quality fix — duplicate filename markers (resolved 2026-05-04)
+
+20 files in `T65_RH50/` and `T75_RH40/` originally had ` (1)` suffix in
+filename, likely from re-download from Google Drive. Investigation showed
+these were the ONLY copies for their replica numbers (not actual duplicates).
+Files were renamed to canonical form (`Pomiar{N}.txt`) and ingested.
+
+Manifest pre-fix: 680 unique experiments (T65_RH50: 8, T75_RH40: 12).
+Manifest post-fix: 700 unique experiments (all conditions: 20 replicas).
+
+Verification: numerical replicate IDs in original `(1)` files were disjoint
+from non-`(1)` files in the same condition folder, confirming they represent
+distinct measurements rather than duplicates.
+
 ## ML Tasks (all TODO)
 
 | # | Task | Type |
@@ -110,3 +124,26 @@ When asking an LLM for help with this project, always include:
 4. The specific test that is failing (if applicable)
 
 **Do not paste raw 41648-row data files.** Use `head -20` or the parsed DataFrame summary.
+
+## Data quality fixes (resolved 2026-05-04)
+
+### Filename duplicate markers
+
+20 files in `T65_RH50/` and `T75_RH40/` originally had ` (1)` suffix
+(non-breaking space + `(1)` pattern), likely artifact from re-download
+from Google Drive. Investigation showed these were the ONLY copies for
+their replica numbers — not actual byte-level duplicates of canonical files.
+
+Replicate numbers in `(1)`-suffixed files were disjoint from non-suffixed
+files in same folder, confirming distinct measurements:
+- T65_RH50: non-suffixed {1,3,5,9,11,16,17,20} ∪ suffixed {2,4,6,7,8,10,12,13,14,15,18,19} = full set 1..20
+- T75_RH40: non-suffixed {1..11,20} ∪ suffixed {12..19} = full set 1..20
+
+Resolution: explicit `mv` to canonical names, then re-ingested.
+Final dataset: shape (700, 41648, 5), 35 conditions × 20 replicates,
+zero anomalies.
+
+Note: bash/zsh parameter expansion (`${var/ (1)/}`) failed to match the
+suffix pattern despite glob `*(1)*` matching files — likely Unicode whitespace
+mismatch (NBSP U+00A0 vs ASCII space U+0020). Explicit single-quoted `mv`
+worked because single-quotes treat the string as literal bytes.
