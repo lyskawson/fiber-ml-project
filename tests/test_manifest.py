@@ -2,8 +2,6 @@
 
 from pathlib import Path
 
-import pytest
-
 from fiber_ml.ingest.manifest import MANIFEST_COLUMNS, build_manifest
 
 
@@ -48,7 +46,7 @@ class TestDuplicateMarkerDetection:
             Number of Data Points (in this file):  1
             NOTE: Data stored in this file is not decimated.
 
-            Length (m)\tLength (m)\tAmplitude (dB/mm)\tSpectral Shift (GHz)\tSpectral Shift Quality\t
+            Length (m)\tLength (m)\tAmplitude (dB/mm)\tSpectral Shift (GHz)\tSpectral Shift Quality\t  # noqa: E501
             1.0\t2.0\t-100.0\t-1.0\t0.5\t
         """)
         (cond_dir / "Pomiar10 (1).txt").write_text(content, encoding="utf-8")

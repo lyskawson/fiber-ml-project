@@ -74,7 +74,7 @@ class TestParseValidation:
             Number of Data Points (in this file):  2
             NOTE: Data stored in this file is not decimated.
 
-            Length (m)\tLength (m)\tAmplitude (dB/mm)\tSpectral Shift (GHz)\tSpectral Shift Quality\t
+            Length (m)\tLength (m)\tAmplitude (dB/mm)\tSpectral Shift (GHz)\tSpectral Shift Quality\t  # noqa: E501
             1.0\t2.0\t-100.0\t-1.0\t0.5\t
             2.0\t3.0\t-101.0\t-2.0\t0.6\t
             3.0\t4.0\t-102.0\t-3.0\t0.7\t

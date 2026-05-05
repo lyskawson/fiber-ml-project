@@ -1,4 +1,4 @@
-from typing import Any
+
 """Build manifest.csv from a directory tree of OBR-4600 measurement files.
 
 Scans T{T}_RH{RH}/ subdirectories, extracts condition labels and replicate numbers,
@@ -11,6 +11,7 @@ Example:
     >>> df.columns.tolist()
     ['experiment_id', 'file_path', 'T_celsius', 'RH_percent', 'replicate', ...]
 """
+from typing import Any
 
 from __future__ import annotations
 
