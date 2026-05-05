@@ -45,3 +45,5 @@ gdrive-credentials.json
 
 # Claude Code memory (local agent state)
 .claude/
+!data/raw/.gitkeep
+!data_processed/.gitkeep

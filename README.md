@@ -1,5 +1,4 @@
 # fiber-ml-project
-
 Projekt naukowo-wdrożeniowy: modelowanie temperatury (T) i wilgotności względnej (RH)
 na podstawie rozproszonych danych światłowodowych z czujnika **Luna OBR-4600**.
 
@@ -13,99 +12,98 @@ Opracowanie pipeline'u ML obejmującego 6 zadań:
 5. Analiza histerezy T/RH
 6. Analiza struktury przestrzenno-czasowej sygnału
 
-Wymóg Trusted AI: pełna reprodukowalność, wersjonowanie danych (DVC), kontrola data leakage, interpretowalność modeli.
+Wymóg Trusted AI: pełna reprodukowalność, kontrola data leakage, interpretowalność modeli.
 
 ## Quickstart
 
 ```bash
-git clone <repo-url>
+git clone https://github.com/lyskawson/fiber-ml-project.git
 cd fiber-ml-project
 
 # Instalacja środowiska (Python 3.11)
 uv sync --extra dev
 
-# Pobranie danych (wymaga skonfigurowanego DVC remote — patrz sekcja DVC Setup)
-dvc pull
+# Pobranie danych z Hugging Face Hub (~1.7 GB, 5-10 min)
+# Wymaga tokena HF z dostępem do private datasetu — patrz "Dataset access" niżej
+export HF_TOKEN='hf_xxxxxxxxxxxxxxxxxxx'
+uv run python scripts/download_from_hf.py
 
-# Testy na danych sample (wbudowane w repo)
+# Testy na danych sample
 uv run pytest tests/ -v
+```
 
-# Ingest na danych sample (test pipeline bez pełnych danych)
-uv run python scripts/01_build_manifest.py --data-dir data/sample --output data/manifest_sample.csv
-uv run python scripts/02_ingest_to_zarr.py --manifest data/manifest_sample.csv --output /tmp/sample.zarr --sample
+## Dataset access
+
+Raw measurements (~1.5 GB) i processed Zarr (~162 MB) są przechowywane na
+[Hugging Face Hub](https://huggingface.co/datasets/lyskawson/fiber-ml-luna-obr-4600)
+jako prywatny dataset.
+
+### Setup dla nowego członka zespołu
+
+1. Załóż konto: https://huggingface.co/join
+2. Wyślij swój HF username liderowi (lyskawson) — dostaniesz `read` access
+3. Wygeneruj token z rolą `Read`: https://huggingface.co/settings/tokens
+4. Pobierz dataset:
+
+```bash
+export HF_TOKEN='hf_xxxxxxxxxxxxxxxxxxx'
+uv run python scripts/download_from_hf.py             # all
+uv run python scripts/download_from_hf.py --what raw       # tylko raw
+uv run python scripts/download_from_hf.py --what processed # tylko Zarr
+```
+
+### Re-upload (tylko team lead, wymaga tokena `Write`)
+
+```bash
+export HF_TOKEN='hf_xxxxxxxxxxxxxxxxxxx'   # Write scope
+uv run python scripts/upload_to_hf.py
 ```
 
 ## Struktura repo
-
-```
 .
 ├── src/fiber_ml/          # Główny pakiet Python
-│   ├── ingest/            # Parser .txt, budowanie manifestu, konwersja do Zarr
+│   ├── ingest/            # Parser .txt, manifest, konwersja do Zarr
 │   ├── preprocessing/     # (TBD) normalizacja, segmentacja
 │   ├── features/          # (TBD) feature engineering
 │   ├── models/            # (TBD) modele ML
 │   ├── eval/              # (TBD) metryki, wykresy
 │   └── utils/             # Ścieżki, helpery
-├── scripts/               # CLI: 01_build_manifest, 02_ingest_to_zarr
+├── scripts/
+│   ├── 01_build_manifest.py    # raw .txt -> manifest.csv
+│   ├── 02_ingest_to_zarr.py    # raw .txt -> Zarr dataset
+│   ├── upload_to_hf.py         # local -> HF Hub (team lead)
+│   └── download_from_hf.py     # HF Hub -> local (każdy)
 ├── tests/                 # Testy pytest (działają na data/sample/)
-├── data/sample/           # 2 pliki pomiarowe (T35_RH20) — w gicie
-├── data/raw/              # 700 plików (~1.6 GB) — DVC tracked
-├── data_processed/        # Zarr dataset — DVC tracked
+├── data/sample/           # 2 pliki pomiarowe — w gicie do CI/testów
+├── data/raw/              # 700 plików (~1.5 GB) — gitignored, na HF Hub
+├── data/manifest.csv      # Mapa plików -> warunki — w gicie
+├── data_processed/        # Zarr dataset — gitignored, na HF Hub
 ├── docs/                  # Opis formatu, ADR, dokumentacja projektu
 ├── notebooks/             # Eksploracja EDA
-├── reports/               # Metryki, wykresy (generowane)
-├── dvc.yaml               # Pipeline DAG
-└── params.yaml            # Hiperparametry i konfiguracja
-```
+└── reports/               # Metryki, wykresy (generowane)
 
-## DVC Setup
+## Workflow regeneracji datasetu
 
-### 1. Utwórz folder na Google Drive
-
-Utwórz pusty folder na swoim Google Drive. Skopiuj **Folder ID** z URL:
-`https://drive.google.com/drive/folders/<FOLDER_ID>`
-
-### 2. Zaktualizuj konfigurację DVC
+Zarr generowany jest deterministycznie z raw przez:
 
 ```bash
-# Podmień FOLDER_ID_PLACEHOLDER na właściwe ID
-dvc remote modify gdrive url gdrive://<FOLDER_ID>
+uv run python scripts/01_build_manifest.py --data-dir data/raw --output data/manifest.csv
+uv run python scripts/02_ingest_to_zarr.py --manifest data/manifest.csv --output data_processed/dataset.zarr
 ```
 
-### 3. Skonfiguruj Service Account (zalecane dla zespołu)
-
-Dokumentacja: [DVC Google Drive Service Account](https://dvc.org/doc/user-guide/data-management/remote-storage/google-drive)
-
-```bash
-dvc remote modify gdrive gdrive_use_service_account true
-dvc remote modify gdrive gdrive_service_account_json_file_path path/to/credentials.json
-```
-
-> **Uwaga**: Plik `credentials.json` dodaj do `.gitignore` — **nie commituj sekretów**.
-
-### 4. Pierwsze pobranie danych
-
-```bash
-dvc pull
-```
+Po regeneracji team lead robi re-upload (`scripts/upload_to_hf.py`).
 
 ## Workflow dla zespołu
 
 ### Nazewnictwo branchy
-
-```
 task/<num>-<short-desc>    # np. task/1-static-regression-T
-```
 
 ### Conventional commits
-
-```
 feat: add static T regression model
 fix: handle NaN in spectral shift channel
 docs: update data_format.md with supervisor clarification
 chore: bump zarr to 2.18
 test: add regression test for sparse spectral shift
-```
 
 ### Pull Request
 

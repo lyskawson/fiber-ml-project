@@ -16,7 +16,7 @@ dependencies = [
     "torch>=2.2",
     "lightgbm>=4.3",
     # DVC
-    "dvc[gdrive]>=3.0",
+    "huggingface-hub>=1.13.0",
 ]
 
 [project.optional-dependencies]
