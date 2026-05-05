@@ -1,3 +1,4 @@
+from typing import Any
 """Build manifest.csv from a directory tree of OBR-4600 measurement files.
 
 Scans T{T}_RH{RH}/ subdirectories, extracts condition labels and replicate numbers,
@@ -62,7 +63,7 @@ def build_manifest(data_dir: Path) -> pd.DataFrame:
         DataFrame with MANIFEST_COLUMNS. Includes non-measurement files with a note.
         Files with duplicate markers are flagged but not removed.
     """
-    rows: list[dict] = []
+    rows: list[dict[str, Any]] = []
 
     condition_dirs = sorted(
         d for d in data_dir.iterdir() if d.is_dir() and _CONDITION_RE.match(d.name)

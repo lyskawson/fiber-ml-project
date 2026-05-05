@@ -28,7 +28,7 @@ Example:
 from __future__ import annotations
 
 import logging
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 import numpy as np
@@ -135,7 +135,7 @@ def ingest_to_zarr(
             "project": "fiber-ml-project",
             "sensor_model": "Luna OBR-4600",
             "source": str(manifest_path),
-            "created_at": datetime.now(timezone.utc).isoformat(),
+            "created_at": datetime.now(UTC).isoformat(),
             "n_files": n_exp,
             "open_questions": (
                 "Spectral Shift (GHz) and second Length (m) are non-null only for the "
@@ -172,7 +172,7 @@ def _write_ingest_report(
 
     lines: list[str] = [
         "=== Ingest Report ===",
-        f"Created:        {datetime.now(timezone.utc).isoformat()}",
+        f"Created:        {datetime.now(UTC).isoformat()}",
         f"Files ingested: {n_exp}",
         f"Total bytes:    {total_bytes:,}",
         f"Dataset shape:  {data_arr.shape}  (experiment × position × channel)",
