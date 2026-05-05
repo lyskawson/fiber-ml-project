@@ -66,6 +66,7 @@ uv run python scripts/upload_to_hf.py
 > Trzymaj w env var (`export HF_TOKEN=...`) lub w lokalnym `.env` (gitignored).
 
 ## Struktura repo
+```text
 .
 ├── src/fiber_ml/          # Główny pakiet Python
 │   ├── ingest/            # Parser .txt, manifest, konwersja do Zarr
@@ -87,6 +88,8 @@ uv run python scripts/upload_to_hf.py
 ├── docs/                  # Opis formatu, ADR, dokumentacja projektu
 ├── notebooks/             # Eksploracja EDA
 └── reports/               # Metryki, wykresy (generowane)
+...
+```
 
 ## Workflow regeneracji datasetu
 
