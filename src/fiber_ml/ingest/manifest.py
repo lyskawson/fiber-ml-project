@@ -12,7 +12,6 @@ Example:
     ['experiment_id', 'file_path', 'T_celsius', 'RH_percent', 'replicate', ...]
 """
 from typing import Any
-
 from __future__ import annotations
 
 import hashlib
