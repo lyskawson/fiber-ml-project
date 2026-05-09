@@ -1,1 +1,1 @@
-"""Eval module — placeholder."""
+"""Evaluation metrics and reporting."""

@@ -21,7 +21,7 @@ data_processed/**
 !data/sample/**
 
 # Models / artifacts
-models/
+/models/
 *.pt
 *.onnx
 *.pkl
