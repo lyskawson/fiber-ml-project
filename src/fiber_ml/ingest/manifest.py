@@ -11,8 +11,9 @@ Example:
     >>> df.columns.tolist()
     ['experiment_id', 'file_path', 'T_celsius', 'RH_percent', 'replicate', ...]
 """
-from typing import Any
 from __future__ import annotations
+
+from typing import Any
 
 import hashlib
 import logging

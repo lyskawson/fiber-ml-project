@@ -47,3 +47,9 @@ gdrive-credentials.json
 .claude/
 !data/raw/.gitkeep
 !data_processed/.gitkeep
+
+# Local development artifacts
+data_raw/
+data_processed_local/
+check_*.py
+compare_zarr.py
