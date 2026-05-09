@@ -1,1 +1,1 @@
-"""Features module — placeholder."""
+"""Feature engineering for FOS measurements."""
