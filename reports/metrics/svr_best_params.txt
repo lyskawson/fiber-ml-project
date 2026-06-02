@@ -1,0 +1,9 @@
+SVR best hyperparameters (GridSearchCV, 3-fold CV)
+==================================================
+
+svr__estimator__C: 1000.0
+svr__estimator__epsilon: 0.01
+svr__estimator__gamma: 0.01
+svr__estimator__kernel: rbf
+
+Best CV MAE: 3.2020

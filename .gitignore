@@ -26,12 +26,6 @@ data_processed/**
 *.onnx
 *.pkl
 
-# Reports (generated)
-reports/metrics/*
-reports/figures/*
-!reports/metrics/.gitkeep
-!reports/figures/.gitkeep
-
 # OS / IDE
 .DS_Store
 .idea/
@@ -53,3 +47,6 @@ data_raw/
 data_processed_local/
 check_*.py
 compare_zarr.py
+
+# Hugging Face cache
+.hf_cache/
