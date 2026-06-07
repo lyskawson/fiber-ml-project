@@ -1,0 +1,8 @@
+MLP best hyperparameters (GridSearchCV, 3-fold CV)
+==================================================
+
+mlp__alpha: 1e-06
+mlp__hidden_layer_sizes: (64, 64)
+mlp__solver: lbfgs
+
+Best CV MAE: 2.7983

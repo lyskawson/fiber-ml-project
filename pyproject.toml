@@ -17,6 +17,7 @@ dependencies = [
     "lightgbm>=4.3",
     # DVC
     "huggingface-hub>=1.13.0",
+    "matplotlib>=3.10.9",
 ]
 
 [project.optional-dependencies]
