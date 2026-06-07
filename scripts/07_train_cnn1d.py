@@ -140,17 +140,19 @@ def standardize_target(y_train, y_other):
 
 # ==================== TRENING ====================
 def train_model(X_train, y_train, X_val, y_val, device: str = "cpu",
-                seed: int = 42) -> tuple[nn.Module, tuple]:
+                seed: int = 42) -> tuple[nn.Module, tuple, tuple]:
     """Trenuje CNN1D z early stopping.
 
-    Zwraca: (model, (y_mu, y_sigma)) - parametry do denormalizacji predykcji.
+    Zwraca: model, X_stats, y_stats.
+    X_stats są potrzebne do identycznej normalizacji zbioru testowego.
+
     """
     torch.manual_seed(seed)
     np.random.seed(seed)
 
     # Standaryzacja
-    X_train_n, X_val_n, _ = standardize_input(X_train, X_val)
-    y_train_n, y_val_n, (y_mu, y_sigma) = standardize_target(y_train, y_val)
+    X_train_n, X_val_n, X_stats = standardize_input(X_train, X_val)
+    y_train_n, y_val_n, y_stats = standardize_target(y_train, y_val)
 
     # Konwersja na tensory
     X_train_t = torch.tensor(X_train_n, dtype=torch.float32).to(device)
@@ -197,16 +199,14 @@ def train_model(X_train, y_train, X_val, y_val, device: str = "cpu",
     if best_state is not None:
         model.load_state_dict(best_state)
 
-    return model, (y_mu, y_sigma), (X_train_n.mean(axis=(0,2), keepdims=True),
-                                     X_train_n.std(axis=(0,2), keepdims=True) + 1e-8)
+    return model, X_stats, y_stats
 
 
 def predict(model: nn.Module, X: np.ndarray, X_stats, y_stats, device: str = "cpu") -> np.ndarray:
     """Predykcja z denormalizacja."""
     mu_x, sigma_x = X_stats
     y_mu, y_sigma = y_stats
-    # X_stats sa juz z znormalizowanego trainu, dlatego liczymy je z surowego mean/std
-    # Ale dla bezpieczenstwa standaryzujemy X z parametrami trainu
+    # Standaryzujemy X tymi samymi statystykami, które policzono na surowym X_train.
     X_n = (X - mu_x) / sigma_x
     X_t = torch.tensor(X_n, dtype=torch.float32).to(device)
     model.eval()
@@ -247,8 +247,7 @@ def main() -> None:
     X_test, y_test = X[split.test], y[split.test]
 
     logger.info("Training CNN1D on replicate split ...")
-    model, y_stats, X_stats = train_model(X_train, y_train, X_val, y_val,
-                                          device=device, seed=args.seed)
+    model, X_stats, y_stats = train_model(X_train, y_train, X_val, y_val, device=device, seed=args.seed)
 
     y_pred = predict(model, X_test, X_stats, y_stats, device=device)
 
@@ -283,7 +282,7 @@ def main() -> None:
         X_ft = X_fold_train[:-n_val]
         y_ft = y_fold_train[:-n_val]
 
-        fold_model, fold_ystats, fold_xstats = train_model(
+        fold_model, fold_xstats, fold_ystats = train_model(
             X_ft, y_ft, X_fv, y_fv, device=device, seed=args.seed,
         )
         y_fold_pred = predict(fold_model, X_fold_test, fold_xstats, fold_ystats,
