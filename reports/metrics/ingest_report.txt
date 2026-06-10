@@ -1,0 +1,61 @@
+=== Ingest Report ===
+Created:        2026-05-04T21:18:23.017286+00:00
+Files ingested: 700
+Total bytes:    1,562,989,402
+Dataset shape:  (700, 41648, 5)  (experiment × position × channel)
+
+--- Conditions ---
+  T= 35°C  RH= 20%  →  20 files
+  T= 35°C  RH= 30%  →  20 files
+  T= 35°C  RH= 40%  →  20 files
+  T= 35°C  RH= 50%  →  20 files
+  T= 35°C  RH= 60%  →  20 files
+  T= 35°C  RH= 70%  →  20 files
+  T= 35°C  RH= 80%  →  20 files
+  T= 45°C  RH= 20%  →  20 files
+  T= 45°C  RH= 30%  →  20 files
+  T= 45°C  RH= 40%  →  20 files
+  T= 45°C  RH= 50%  →  20 files
+  T= 45°C  RH= 60%  →  20 files
+  T= 45°C  RH= 70%  →  20 files
+  T= 45°C  RH= 80%  →  20 files
+  T= 55°C  RH= 20%  →  20 files
+  T= 55°C  RH= 30%  →  20 files
+  T= 55°C  RH= 40%  →  20 files
+  T= 55°C  RH= 50%  →  20 files
+  T= 55°C  RH= 60%  →  20 files
+  T= 55°C  RH= 70%  →  20 files
+  T= 55°C  RH= 80%  →  20 files
+  T= 65°C  RH= 20%  →  20 files
+  T= 65°C  RH= 30%  →  20 files
+  T= 65°C  RH= 40%  →  20 files
+  T= 65°C  RH= 50%  →  20 files
+  T= 65°C  RH= 60%  →  20 files
+  T= 65°C  RH= 70%  →  20 files
+  T= 65°C  RH= 80%  →  20 files
+  T= 75°C  RH= 20%  →  20 files
+  T= 75°C  RH= 30%  →  20 files
+  T= 75°C  RH= 40%  →  20 files
+  T= 75°C  RH= 50%  →  20 files
+  T= 75°C  RH= 60%  →  20 files
+  T= 75°C  RH= 70%  →  20 files
+  T= 75°C  RH= 80%  →  20 files
+
+--- NaN counts per channel (global) ---
+  length_1_m                                 0  (0.00%)
+  length_2_m                        28,588,713  (98.06%)
+  amplitude_db_mm                            0  (0.00%)
+  spectral_shift_ghz                28,588,713  (98.06%)
+  spectral_shift_quality                     0  (0.00%)
+
+--- NaN counts per experiment (first 10) ---
+  T35_RH20_R01            81,682 NaN
+  T35_RH20_R02            81,682 NaN
+  T35_RH20_R03            81,682 NaN
+  T35_RH20_R04            81,682 NaN
+  T35_RH20_R05            81,682 NaN
+  T35_RH20_R06            81,682 NaN
+  T35_RH20_R07            81,682 NaN
+  T35_RH20_R08            81,682 NaN
+  T35_RH20_R09            81,682 NaN
+  T35_RH20_R10            81,682 NaN

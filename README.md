@@ -1,20 +1,20 @@
 # fiber-ml-project
 
-Projekt naukowo-wdrożeniowy: modelowanie temperatury (T) i wilgotności względnej (RH)
-na podstawie rozproszonych danych światłowodowych z czujnika **Luna OBR-4600**.
+Research and deployment project: modelling temperature (T) and relative humidity (RH)
+from distributed optical fiber measurements using the **Luna OBR-4600** sensor.
 
-## Cel projektu
+## Project goals
 
-Opracowanie pipeline'u ML obejmującego 6 zadań:
+Developing an ML pipeline covering 6 tasks:
 
-1. Regresja statyczna T i RH
-2. Regresja dynamiczna T i RH (z uwzględnieniem czasu)
-3. Klasyfikacja reżimu pracy czujnika
+1. Static regression of T and RH
+2. Dynamic regression of T and RH (time-aware)
+3. Sensor operating regime classification
 4. Anomaly detection
-5. Analiza histerezy T/RH
-6. Analiza struktury przestrzenno-czasowej sygnału
+5. T/RH hysteresis analysis
+6. Spatio-temporal structure analysis of the signal
 
-Wymóg Trusted AI: pełna reprodukowalność, kontrola data leakage, interpretowalność modeli.
+Trusted AI requirement: full reproducibility, data leakage control, model interpretability.
 
 ## Quickstart
 
@@ -22,78 +22,78 @@ Wymóg Trusted AI: pełna reprodukowalność, kontrola data leakage, interpretow
 git clone https://github.com/lyskawson/fiber-ml-project.git
 cd fiber-ml-project
 
-# Instalacja środowiska (Python 3.11)
+# Set up environment (Python 3.11)
 uv sync --extra dev
 
-# Pobranie danych z Hugging Face Hub (~1.7 GB, ~2 min na dobrym łączu)
+# Download data from Hugging Face Hub (~1.7 GB, ~2 min on a fast connection)
 export HF_TOKEN='hf_xxxxxxxxxxxxxxxxxxx'
 uv run python scripts/download_from_hf.py
 
-# Walidacja środowiska
+# Validate environment
 uv run pytest tests/ -v
 ```
 
 ## Dataset access
 
-Raw measurements (~1.5 GB) i processed Zarr (~162 MB) są przechowywane na
+Raw measurements (~1.5 GB) and processed Zarr (~162 MB) are stored on
 [Hugging Face Hub](https://huggingface.co/datasets/lyskawson/fiber-ml-luna-obr-4600)
-jako prywatny dataset.
+as a private dataset.
 
-### Setup dla nowego członka zespołu
+### Setup for a new team member
 
-1. Załóż konto: https://huggingface.co/join
-2. Wyślij swój HF username liderowi (lyskawson) — dostaniesz **Write** access (każdy w zespole jest równoprawnym kontrybutorem)
-3. Wygeneruj token z rolą **Write**: https://huggingface.co/settings/tokens
-4. Pobierz dataset:
+1. Create an account: https://huggingface.co/join
+2. Send your HF username to the lead (lyskawson) — you will receive **Write** access (all team members are equal contributors)
+3. Generate a token with **Write** role: https://huggingface.co/settings/tokens
+4. Download the dataset:
 
 ```bash
 export HF_TOKEN='hf_xxxxxxxxxxxxxxxxxxx'
-uv run python scripts/download_from_hf.py                  # wszystko
-uv run python scripts/download_from_hf.py --what raw       # tylko raw
-uv run python scripts/download_from_hf.py --what processed # tylko Zarr
+uv run python scripts/download_from_hf.py                  # everything
+uv run python scripts/download_from_hf.py --what raw       # raw only
+uv run python scripts/download_from_hf.py --what processed # Zarr only
 ```
 
-### Re-upload zmienionych danych
+### Re-uploading changed data
 
-Każdy w zespole z tokenem Write może upload'ować zmiany:
+Anyone on the team with a Write token can upload changes:
 
 ```bash
 export HF_TOKEN='hf_xxxxxxxxxxxxxxxxxxx'   # Write scope
 uv run python scripts/upload_to_hf.py
 ```
 
-> **Uwaga**: Tokenów HF nigdy nie commituj do gita ani nie wklejaj w czatach/issues/PR.
-> Trzymaj w env var (`export HF_TOKEN=...`) lub w lokalnym `.env` (gitignored).
+> **Warning**: Never commit HF tokens to git or paste them in chats/issues/PRs.
+> Keep them in an env var (`export HF_TOKEN=...`) or in a local `.env` (gitignored).
 
-## Struktura repo
+## Repository structure
 ```text
 .
-├── src/fiber_ml/          # Główny pakiet Python
-│   ├── ingest/            # Parser .txt, manifest, konwersja do Zarr
-│   ├── preprocessing/     # (TBD) normalizacja, segmentacja
+├── src/fiber_ml/          # Main Python package
+│   ├── ingest/            # .txt parser, manifest, Zarr conversion
+│   ├── preprocessing/     # (TBD) normalisation, segmentation
 │   ├── features/          # (TBD) feature engineering
-│   ├── models/            # (TBD) modele ML
-│   ├── eval/              # (TBD) metryki, wykresy
-│   └── utils/             # Ścieżki, helpery
+│   ├── models/            # (TBD) ML models
+│   ├── eval/              # (TBD) metrics, plots
+│   └── utils/             # Paths, helpers
 ├── scripts/
 │   ├── 01_build_manifest.py    # raw .txt -> manifest.csv
 │   ├── 02_ingest_to_zarr.py    # raw .txt -> Zarr dataset
 │   ├── upload_to_hf.py         # local -> HF Hub
 │   └── download_from_hf.py     # HF Hub -> local
-├── tests/                 # Testy pytest (działają na data/sample/)
-├── data/sample/           # 2 pliki pomiarowe — w gicie do CI/testów
-├── data/raw/              # 700 plików (~1.5 GB) — gitignored, na HF Hub
-├── data/manifest.csv      # Mapa plików -> warunki — w gicie
-├── data_processed/        # Zarr dataset — gitignored, na HF Hub
-├── docs/                  # Opis formatu, ADR, dokumentacja projektu
-├── notebooks/             # Eksploracja EDA
-└── reports/               # Metryki, wykresy (generowane)
+├── tests/                 # pytest tests (run against data/sample/)
+├── data/sample/           # 2 measurement files — in git for CI/tests
+├── data/raw/              # 700 files (~1.5 GB) — gitignored, on HF Hub
+├── data/manifest.csv      # File -> conditions map — in git
+├── data_processed/        # Zarr dataset — gitignored, on HF Hub
+├── docs/                  # Format description, ADRs, project documentation
+├── notebooks/             # EDA exploration
+└── reports/               # Metrics, plots (generated)
 ...
 ```
 
-## Workflow regeneracji datasetu
+## Dataset regeneration workflow
 
-Zarr generowany jest deterministycznie z raw przez:
+The Zarr dataset is generated deterministically from raw data via:
 
 ```bash
 uv run python scripts/01_build_manifest.py \
@@ -105,14 +105,14 @@ uv run python scripts/02_ingest_to_zarr.py \
     --output data_processed/dataset.zarr
 ```
 
-Po regeneracji wykonaj re-upload na HF: `uv run python scripts/upload_to_hf.py`.
+After regeneration, re-upload to HF: `uv run python scripts/upload_to_hf.py`.
 
-## Workflow dla zespołu
+## Team workflow
 
-### Nazewnictwo branchy
-task/<num>-<short-desc>    # np. task/1-static-regression-T
-fix/<short-desc>           # np. fix/spectral-shift-nan-handling
-docs/<short-desc>          # np. docs/add-data-format-spec
+### Branch naming
+task/<num>-<short-desc>    # e.g. task/1-static-regression-T
+fix/<short-desc>           # e.g. fix/spectral-shift-nan-handling
+docs/<short-desc>          # e.g. docs/add-data-format-spec
 
 ### Conventional commits
 feat: add static T regression model
@@ -123,19 +123,19 @@ test: add regression test for sparse spectral shift
 
 ### Pull Request
 
-- Branch z `main`, PR do `main`
-- CI musi przejść (lint + typecheck + testy)
+- Branch from `main`, PR into `main`
+- CI must pass (lint + typecheck + tests)
 - Minimum 1 reviewer
 
 ## Onboarding — first steps
 
-Po setupie środowiska każdy z zespołu:
+After setting up the environment, each team member should:
 
-1. Czyta `CONTEXT.md` w całości (architektura, open questions, anti-patterns)
-2. Bierze sobie jedno z 8 ML tasks z sekcji "ML Tasks" w `CONTEXT.md`
-3. Tworzy branch `task/X-...` i notebook eksploracyjny w `notebooks/`
-4. **Zanim zacznie feature engineering**: open question #1 (Spectral Shift) musi być wyjaśniony z prowadzącym
+1. Read `CONTEXT.md` in full (architecture, open questions, anti-patterns)
+2. Pick one of the 8 ML tasks from the "ML Tasks" section in `CONTEXT.md`
+3. Create a `task/X-...` branch and an exploratory notebook in `notebooks/`
+4. **Before starting feature engineering**: open question #1 (Spectral Shift) must be clarified with the supervisor
 
-## Zespół
+## Team
 
-Patrz [CONTRIBUTORS.md](CONTRIBUTORS.md).
+See [CONTRIBUTORS.md](CONTRIBUTORS.md).

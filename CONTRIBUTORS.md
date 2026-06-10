@@ -1,7 +1,7 @@
 # Contributors
 
-Wszyscy członkowie zespołu są równoprawnymi kontrybutorami z pełnym dostępem (Write)
-do GitHub repo i Hugging Face dataset.
+All team members are equal contributors with full access (Write)
+to the GitHub repository and Hugging Face dataset.
 
 - Alek Łyskawa (@lyskawson)
 - Mega Zofia
