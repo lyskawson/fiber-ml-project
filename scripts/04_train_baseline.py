@@ -38,7 +38,7 @@ from fiber_ml.features.aggregated import (
     aggregate_from_zarr,
     feature_columns,
 )
-from fiber_ml.models.baseline import TARGETS, fit_all_baselines, fit_baseline
+from fiber_ml.models.baseline import TARGETS, ModelName, fit_all_baselines, fit_baseline
 from fiber_ml.models.splits import loco_cv, replicate_split
 
 logger = logging.getLogger(__name__)
@@ -59,13 +59,18 @@ def _load_features(args: argparse.Namespace) -> pd.DataFrame:
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--features", type=Path,
-                        help="Path to aggregated features parquet.")
-    parser.add_argument("--zarr", type=Path,
-                        help="Path to Zarr dataset (used if --features absent).")
-    parser.add_argument("--output-dir", type=Path,
-                        default=Path("reports/metrics"),
-                        help="Where to write the CSV outputs.")
+    parser.add_argument(
+        "--features", type=Path, help="Path to aggregated features parquet."
+    )
+    parser.add_argument(
+        "--zarr", type=Path, help="Path to Zarr dataset (used if --features absent)."
+    )
+    parser.add_argument(
+        "--output-dir",
+        type=Path,
+        default=Path("reports/metrics"),
+        help="Where to write the CSV outputs.",
+    )
     parser.add_argument("--seed", type=int, default=42)
     args = parser.parse_args()
 
@@ -80,7 +85,9 @@ def main() -> None:
     split = replicate_split(df)
     logger.info(
         "Replicate split: train=%d, val=%d, test=%d",
-        len(split.train), len(split.val), len(split.test),
+        len(split.train),
+        len(split.val),
+        len(split.test),
     )
 
     models = fit_all_baselines(df, feature_cols, split.train, seed=args.seed)
@@ -101,38 +108,54 @@ def main() -> None:
         per_cond_rows.append(pc)
 
     pd.concat(per_target_rows, ignore_index=True).to_csv(
-        args.output_dir / "baseline_per_target.csv", index=False,
+        args.output_dir / "baseline_per_target.csv",
+        index=False,
     )
     pd.concat(per_cond_rows, ignore_index=True).to_csv(
-        args.output_dir / "baseline_per_condition.csv", index=False,
+        args.output_dir / "baseline_per_condition.csv",
+        index=False,
     )
     logger.info("Wrote baseline_per_target.csv and baseline_per_condition.csv")
 
-    # ---- LOCO CV: section-9 generalisation report (Ridge only by default) ----
-    logger.info("Running Leave-One-Condition-Out CV with Ridge ...")
-    fold_results = []
-    for (T, RH), fold_split in loco_cv(df):
-        model = fit_baseline("ridge", df, feature_cols, fold_split.train,
-                             seed=args.seed)
-        df_test = df.iloc[fold_split.test].reset_index(drop=True)
-        y_true = df_test[list(TARGETS)].to_numpy()
-        y_pred = model.predict(df_test)
-        pt = per_target_metrics(y_true, y_pred)
-        fold_results.append({"T": T, "RH": RH, "per_target": pt})
+    # ---- LOCO CV: generalisation report for ALL baselines ----
+    baseline_names: tuple[ModelName, ...] = (
+        "ridge",
+        "lasso",
+        "random_forest",
+        "gradient_boosting",
+    )
+    for model_name in baseline_names:
+        logger.info("Running Leave-One-Condition-Out CV with %s ...", model_name)
+        fold_results = []
+        for (T, RH), fold_split in loco_cv(df):
+            model = fit_baseline(
+                model_name, df, feature_cols, fold_split.train, seed=args.seed
+            )
+            df_test = df.iloc[fold_split.test].reset_index(drop=True)
+            y_true = df_test[list(TARGETS)].to_numpy()
+            y_pred = model.predict(df_test)
+            pt = per_target_metrics(y_true, y_pred)
+            fold_results.append({"T": T, "RH": RH, "per_target": pt})
 
-    folds_long: list[pd.DataFrame] = []
-    for fr in fold_results:
-        f = fr["per_target"].copy()
-        f["T_holdout"] = fr["T"]
-        f["RH_holdout"] = fr["RH"]
-        folds_long.append(f)
-    pd.concat(folds_long, ignore_index=True).to_csv(
-        args.output_dir / "loco_folds.csv", index=False,
-    )
-    summarise_loco(fold_results).to_csv(
-        args.output_dir / "loco_summary.csv", index=False,
-    )
-    logger.info("Wrote loco_folds.csv and loco_summary.csv")
+        folds_long: list[pd.DataFrame] = []
+        for fr in fold_results:
+            f = fr["per_target"].copy()
+            f["T_holdout"] = fr["T"]
+            f["RH_holdout"] = fr["RH"]
+            folds_long.append(f)
+
+        # Use prefix for non-ridge models, keep legacy names for ridge
+        if model_name == "ridge":
+            folds_path = args.output_dir / "loco_folds.csv"
+            summary_path = args.output_dir / "loco_summary.csv"
+        else:
+            folds_path = args.output_dir / f"{model_name}_loco_folds.csv"
+            summary_path = args.output_dir / f"{model_name}_loco_summary.csv"
+
+        pd.concat(folds_long, ignore_index=True).to_csv(folds_path, index=False)
+        summarise_loco(fold_results).to_csv(summary_path, index=False)
+        logger.info("Wrote %s and %s", folds_path.name, summary_path.name)
+
     logger.info("Done.")
 
 
